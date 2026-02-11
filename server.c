@@ -75,8 +75,12 @@ int init_database() {
             // If no users, create a default user
             if (count == 0) {
                 const char *insert_user = 
-                    "INSERT INTO Users (first_name, last_name, user_name, password, usd_balance) "
-                    "VALUES ('Robby', 'Bobby', 'Rob_bob', 'password123', 100.0);";
+                    "INSERT INTO Users (first_name, last_name, user_name, password, usd_balance) VALUES "
+                    "('Robby', 'Bobby', 'Rob_bob', 'password123', 100.0),"
+                    "('John', 'Smith', 'john_sm', 'john123', 100.0),"
+                    "('Alice', 'Johnson', 'alice_jh', 'alice432', 100.0),"
+                    "('Charlie', 'Brown', 'charlie_b', 'brown_21', 100.0),"
+                    "('Diana', 'Prince', 'wonder_d', 'diana891', 100.0);";
                 
                 rc = sqlite3_exec(db, insert_user, 0, 0, &err_msg);
                 if (rc != SQLITE_OK) {
@@ -84,7 +88,7 @@ int init_database() {
                     sqlite3_free(err_msg);
                     return 1;
                 }
-                printf("Created default user: Robby Bobby with $100 balance\n");
+                printf("Created 5 default user");
             }
         }
     }
