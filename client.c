@@ -6,9 +6,8 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <string.h>
-#include <strings.h>
 
-#define SERVER_PORT 5432
+#define SERVER_PORT 6506
 #define MAX_LINE 256
 
 // Function to display menu
@@ -19,10 +18,10 @@ void display_menu() {
     printf("   Example: BUY MSFT 3.4 1.35 1\n\n");
     printf("2. SELL <stock_symbol> <amount> <price_per_stock> <user_id>\n");
     printf("   Example: SELL APPL 2 1.45 1\n\n");
-    printf("3. LIST [user_id]\n");
-    printf("   Example: LIST 1 (or just LIST for default user)\n\n");
-    printf("4. BALANCE [user_id]\n");
-    printf("   Example: BALANCE 1 (or just BALANCE for default user)\n\n");
+    printf("3. LIST <user_id>\n");
+    printf("   Example: LIST 1 (or just LIST for default user 1)\n\n");
+    printf("4. BALANCE <user_id>\n");
+    printf("   Example: BALANCE 1 (or just BALANCE for default user 1)\n\n");
     printf("5. QUIT - Close client connection\n");
     printf("6. SHUTDOWN - Shutdown the server\n");
     printf("==========================================\n");
@@ -78,7 +77,6 @@ int main(int argc, char* argv[]) {
     /* main loop: display menu, get commands, send to server, and receive responses */
     while (1) {
         display_menu();
-        fflush(stdout);  // Force output immediately
         
         // Get input from user
         if (fgets(buf, sizeof(buf), stdin) == NULL) {
@@ -96,16 +94,13 @@ int main(int argc, char* argv[]) {
             continue;
         }
         
-        // Add newline back for server processing
-        strcat(buf, "\n");
-        
+            
         // Send command to server immediately
         len = strlen(buf);
         if (send(s, buf, len, 0) < 0) {
             perror("client: send");
             break;
         }
-        fflush(NULL);  // Flush all output buffers
         
         // Receive response from server
         memset(response, 0, sizeof(response));
@@ -116,9 +111,7 @@ int main(int argc, char* argv[]) {
         }
         
         response[len] = '\0';
-        printf("\n%s\n", response);
-        fflush(stdout);
-        
+        printf("\n%s\n", response);        
         // Check if it was a QUIT or SHUTDOWN command
         if (strncmp(buf, "QUIT", 4) == 0 || strncmp(buf, "SHUTDOWN", 8) == 0) {
             printf("Closing connection...\n");
@@ -130,4 +123,3 @@ int main(int argc, char* argv[]) {
     printf("Client terminated.\n");
     return 0;
 }
-
