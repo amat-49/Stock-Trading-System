@@ -54,33 +54,41 @@ void *receive_thread(void *arg)
     char response[MAX_LINE * 8];
     int len;
 
-    while(client_running)
+    while (client_running)
     {
         fd_set read_set;
         FD_ZERO(&read_set);
         FD_SET(s, &read_set);
 
-        //block til server data arries with no timeout
-        if(select( s+ 1, &read_set, NULL, NULL, NULL) < 0)
+        struct timeval tv;
+        tv.tv_sec = 1;
+        tv.tv_usec = 0;
+
+        int ready = select(s + 1, &read_set, NULL, NULL, &tv);
+
+        if (ready < 0)
         {
-            if(!client_running)
+            if (!client_running)
             {
-                //sock closed inttentionally
-                break; 
+                break;
             }
-            perror("select (recieve_thread)");
+            perror("select (receive_thread)");
             break;
         }
 
-        if(FD_ISSET(s, &read_set))
+        if (ready == 0)
+        {
+            continue;
+        }
+
+        if (FD_ISSET(s, &read_set))
         {
             memset(response, 0, sizeof(response));
-            len = recv(s, response, sizeof(response) -1, 0);
+            len = recv(s, response, sizeof(response) - 1, 0);
 
-            if(len <= 0)
+            if (len <= 0)
             {
-                //serevr closed connection
-                if(client_running)
+                if (client_running)
                 {
                     printf("\nServer closed the connection.\n");
                 }
@@ -92,14 +100,13 @@ void *receive_thread(void *arg)
             printf("\n%s\n", response);
             fflush(stdout);
 
-            //detect the server shutdown broadcast
-            if(strstr(response, "Server shutting down") != NULL)
+            if (strstr(response, "Server shutting down") != NULL)
             {
                 client_running = 0;
                 break;
             }
 
-            if(client_running)
+            if (client_running)
             {
                 display_menu();
             }
@@ -210,7 +217,7 @@ int main(int argc, char* argv[]) {
             }
 
             //QUIT exists the client immediately after sending
-            if(strncasecmp(buf, "QUIT", 4) == 0)
+            if(strncmp(buf, "QUIT", 4) == 0)
             {
                 client_running = 0;
                 break;

@@ -921,9 +921,7 @@ void *client_thread(void *arg)
         }
 
         /* exit the thread if client logged out, quit, or server is shutting down */
-        if (strncmp(buf, "LOGOUT", 6) == 0 ||
-            strncmp(buf, "QUIT",   4) == 0 ||
-            server_shutdown)
+        if (strncmp(buf, "QUIT",   4) == 0 || server_shutdown)
         {
             break;
         }
