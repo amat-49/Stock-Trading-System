@@ -19,7 +19,7 @@ $(SERVER): server.c sqlite3.c
 
 # Build the client
 $(CLIENT): client.c
-	$(CC) $(CFLAGS) client.c -o $(CLIENT)
+	$(CC) $(CFLAGS) client.c -o $(CLIENT) -pthread
 
 # Clean up
 clean:
